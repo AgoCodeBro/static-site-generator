@@ -1,5 +1,3 @@
-
-
 class HTMLNode:
 
     def __init__(self, tag=None, value=None, children=None, props=None):
@@ -21,7 +19,7 @@ class HTMLNode:
 
         result = ""
         if self.props is None:
-            raise Exception("Props is empty")
+            return result
 
         for attribute in self.props:
             result += f" {attribute}=\"{self.props[attribute]}\""
@@ -32,3 +30,5 @@ class HTMLNode:
     def __repr__(self):
 
         return f"HTMLNode({self.tag}, {self.value}, {self.children}, {self.props})"
+
+
