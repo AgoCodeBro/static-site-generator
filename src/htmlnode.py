@@ -24,7 +24,7 @@ class HTMLNode():
     
 
     def __repr__(self):
-        properties = self.props_to_html
+        properties = self.props_to_html()
         result = f"Tag: {self.tag}\nValue: {self.value}\nChildren: {self.children}\nProperties: {properties}"
         return result
         
