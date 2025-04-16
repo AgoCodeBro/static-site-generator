@@ -5,19 +5,21 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
     results = []
     for node in old_nodes:
         if node.text_type != TextType.TEXT:
-            results += node
+            results.append(node)
         
         else:
             raw_texts = node.text.split(delimiter)
             isText = True
+
             if len(raw_texts) % 2 != 1:
                 raise Exception("no closing delimeter found")
+            
             for text in raw_texts:
-                if isText:
+                if isText and len(text) > 0:
                     new = TextNode(text, TextType.TEXT)
                     results.append(new)
 
-                else:
+                elif not isText:
                     new = TextNode(text, text_type)
                     results.append(new)
 
@@ -37,7 +39,10 @@ def extract_markdown_links(text):
 def split_nodes_image(old_nodes):
     new_nodes = []
     for node in old_nodes:
-        new_nodes.extend(split_node_image(node))
+        if node.text_type == TextType.TEXT:
+            new_nodes.extend(split_node_image(node))
+        else:
+            new_nodes.append(node)
     
     return new_nodes
 
@@ -70,7 +75,10 @@ def split_node_image(node):
 def split_nodes_link(old_nodes):
     new_nodes = []
     for node in old_nodes:
-        new_nodes.extend(split_node_link(node))
+        if node.text_type == TextType.TEXT:
+            new_nodes.extend(split_node_link(node))
+        else:
+            new_nodes.append(node)
     
     return new_nodes
 
@@ -96,4 +104,30 @@ def split_node_link(node):
         result.append(TextNode(text, TextType.TEXT))
     
     return result
+
+
+def text_to_textnode(text):
+    delimeters = {TextType.BOLD: "**",
+                  TextType.ITALIC:"_",
+                  TextType.CODE:"`"}
+    result = []
+    result.append(TextNode(text, TextType.TEXT))
+
+    for text_type in TextType:
+        if text_type == TextType.TEXT:
+            continue
+
+        elif text_type != TextType.IMAGE and text_type != TextType.LINK:
+            result = split_nodes_delimiter(result, delimeters[text_type], text_type)
+
+        elif text_type == TextType.IMAGE:
+            result = split_nodes_image(result)
+
+        elif text_type == TextType.LINK:
+            result = split_nodes_link(result)
+
+    return result
+        
+
+
 

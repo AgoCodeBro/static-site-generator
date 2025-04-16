@@ -24,6 +24,12 @@ class TestMarkdown(unittest.TestCase):
 
         self.assertEqual(new_nodes, [TextNode("This is text with a ", TextType.TEXT), TextNode("italic", TextType.ITALIC), TextNode(" word", TextType.TEXT),])
 
+    def test_start_delimiter(self):
+        node = TextNode("_italic_ word", TextType.TEXT)
+        new_nodes = split_nodes_delimiter([node], "_", TextType.ITALIC)
+
+        self.assertEqual(new_nodes, [TextNode("italic", TextType.ITALIC), TextNode(" word", TextType.TEXT),])
+    
 
     def test_extract_markdown_images(self):
         matches = extract_markdown_images(
@@ -170,4 +176,40 @@ class TestMarkdown(unittest.TestCase):
         new_nodes = split_nodes_link([node])
 
         self.assertEqual([TextNode("link", TextType.LINK, "https://i.imgur.com/zjjcJKZ.png"),], new_nodes)
+
+    def test_to_text(self):
+        markdown = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        expected_result = [TextNode("This is ", TextType.TEXT),
+                           TextNode("text", TextType.BOLD),
+                           TextNode(" with an ", TextType.TEXT),
+                           TextNode("italic", TextType.ITALIC),
+                           TextNode(" word and a ", TextType.TEXT),
+                           TextNode("code block", TextType.CODE),
+                           TextNode(" and an ", TextType.TEXT),
+                           TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+                           TextNode(" and a ", TextType.TEXT),
+                           TextNode("link", TextType.LINK, "https://boot.dev"),]
+
+        new_nodes = text_to_textnode(markdown)
+
+        self.assertEqual(expected_result, new_nodes)
+
+    def test_only_non_text(self):
+        markdown = "_everything _`is`**something**![image](test.png)"
+        expected_result = [TextNode("everything ", TextType.ITALIC),
+                           TextNode("is", TextType.CODE),
+                           TextNode("something", TextType.BOLD),
+                           TextNode("image", TextType.IMAGE, "test.png")]
+        
+        new_nodes = text_to_textnode(markdown)
+
+        self.assertEqual(new_nodes, expected_result)
+
+    def test_only_text(self):
+        markdown = "This is just text"
+        expected_result = [TextNode(markdown, TextType.TEXT)]
+
+        new_nodes = text_to_textnode(markdown)
+
+        self.assertEqual(new_nodes, expected_result)
 
