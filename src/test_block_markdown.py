@@ -104,8 +104,5 @@ also code
             blocks = markdown_to_blocks(md)
             for block in blocks:
                 result.append(block_to_blocktype(block))
-            for i in range(len(result)):
-                 print()
-                 print(f"Expected:{expected_result[i]}  Actual:{result[i]}")
-                 print()
+
             self.assertEqual(result, expected_result)

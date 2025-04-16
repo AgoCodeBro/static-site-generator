@@ -56,9 +56,6 @@ def block_to_blocktype(block):
     num = 1
 
     for line in lines:
-        print()
-        print(line)
-        print()
         x = line[0]
         y = line [1]
 
