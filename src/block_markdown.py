@@ -59,6 +59,18 @@ def block_to_blocktype(block):
     num = 1
 
     for line in lines:
+        # If "y" would be out of range
+        if len(line) < 2:
+            isOrdered = False
+            isUnordered = False
+
+            if line[0] == ">":
+                continue
+            
+            else:
+                isQuote = False
+                return BlockType.PARAGRAPH
+
         x = line[0]
         y = line [1]
 
