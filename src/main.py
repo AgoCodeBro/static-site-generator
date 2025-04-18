@@ -76,8 +76,8 @@ def generate_page(from_path, template_path, dest_path, basepath):
     template = template.replace("{{ Title }}", title)
     result = template.replace("{{ Content }}", html)
 
-    result = template.replace('href="/', f'href="{basepath}')
-    result = template.replace('src="/', f'src="{basepath}')
+    result = result.replace('href="/', f'href="{basepath}')
+    result = result.replace('src="/', f'src="{basepath}')
     
     dir_name = osp.dirname(dest_path)
 
