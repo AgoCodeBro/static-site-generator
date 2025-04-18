@@ -3,10 +3,14 @@ from htmlnode import HTMLNode
 import os
 import os.path as osp
 import shutil
+import sys
 
 def main():
-    copy_directory("static", "public")
-    generate_pages_recursive("content", "template.html", "public")
+    basepath = "/"
+    if len(sys.argv) > 0:
+        basepath = sys.argv[0]
+    copy_directory("static", "docs")
+    generate_pages_recursive("content", "template.html", "docs", basepath)
 
 
 def extract_title(markdown):
@@ -47,7 +51,7 @@ def copy_directory(source, destination):
             copy_directory(item_path, copy_path)
 
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
     try:
@@ -71,6 +75,9 @@ def generate_page(from_path, template_path, dest_path):
 
     template = template.replace("{{ Title }}", title)
     result = template.replace("{{ Content }}", html)
+
+    result = template.replace('href="/', f'href="{basepath}')
+    result = template.replace('src="/', f'src="{basepath}')
     
     dir_name = osp.dirname(dest_path)
 
@@ -80,7 +87,7 @@ def generate_page(from_path, template_path, dest_path):
     file.write(result)
 
     
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     if not (osp.exists(dir_path_content) and osp.isdir(dir_path_content)):
         raise ValueError("Please provide a valid path to the content directory")
     
@@ -93,11 +100,11 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
         source = osp.join(dir_path_content, item)
         destination = osp.join(dest_dir_path, item)
         if osp.isdir(source):
-            generate_pages_recursive(source, template_path, destination)
+            generate_pages_recursive(source, template_path, destination, basepath)
 
         elif osp.isfile(source):
             if item[-3:] == ".md":
-                generate_page(source, template_path, f"{destination[:-3]}.html")
+                generate_page(source, template_path, f"{destination[:-3]}.html", basepath)
 
 
 
