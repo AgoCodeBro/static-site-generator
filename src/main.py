@@ -6,7 +6,7 @@ import shutil
 
 def main():
     copy_directory("static", "public")
-    generate_page("content/index.md", "template.html", "public/index.html")
+    generate_pages_recursive("content", "template.html", "public")
 
 
 def extract_title(markdown):
@@ -80,6 +80,24 @@ def generate_page(from_path, template_path, dest_path):
     file.write(result)
 
     
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    if not (osp.exists(dir_path_content) and osp.isdir(dir_path_content)):
+        raise ValueError("Please provide a valid path to the content directory")
+    
+    if not osp.exists(template_path):
+        raise ValueError("Please provide a valid path to the template")
+    
+    content = os.listdir(dir_path_content)
+    
+    for item in content:
+        source = osp.join(dir_path_content, item)
+        destination = osp.join(dest_dir_path, item)
+        if osp.isdir(source):
+            generate_pages_recursive(source, template_path, destination)
+
+        elif osp.isfile(source):
+            if item[-3:] == ".md":
+                generate_page(source, template_path, f"{destination[:-3]}.html")
 
 
 
